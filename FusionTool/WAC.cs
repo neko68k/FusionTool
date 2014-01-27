@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace FusionTool
 {
@@ -19,6 +20,8 @@ namespace FusionTool
 
             // not in the file. used internally by program.
             public UInt32 thisOffset;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
+            public String fileName;
         }
         public struct FILE
         {
@@ -29,7 +32,8 @@ namespace FusionTool
 
             // not in the file. used internally by program.
             public UInt32 thisOffset;
-            String fileName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
+            public String fileName;
         }
 
         private Stream inStream;
@@ -44,18 +48,107 @@ namespace FusionTool
 
         }
 
-        public FOLDER GetRoot();
+        public FOLDER GetRoot()
+        {
+            return GetFolder();
+        }
+
         // get an array of folder children from the passed folder or from root if folder == null
-        public FOLDER[] GetFolders(FOLDER folder);
+        //public FOLDER[] GetFolders(FOLDER folder);
         public String GetName(FOLDER folder) { return (GetNameFromOfs(folder.filenameOfs)); }
         public String GetName(FILE file) { return (GetNameFromOfs(file.filenameOfs)); }
 
-        public FILE GetFile(String name);
+        //public FILE GetFile(String name);
         // get an array of file children from the passed folder
-        public FILE[] GetFiles(FOLDER folder);      
+        //public FILE[] GetFiles(FOLDER folder);      
 
-        public void ReplaceFile(String name, byte[] data);
+        //public void ReplaceFile(String name, byte[] data);
 
+        private FOLDER GetFolderFromOfs(UInt32 ofs)
+        {
+            inStream.Seek(ofs, SeekOrigin.Begin);
+            return (GetFolder());
+        }
+
+        private FILE GetFileFromOfs(UInt32 ofs)
+        {
+            inStream.Seek(ofs, SeekOrigin.Begin);
+            return (GetFile());
+        }
+
+        private FOLDER GetFolder()
+        {
+            FOLDER folder = new FOLDER();
+            byte[] marshalled;
+            marshalled = MarshalFolder(folder);
+            inStream.Read(marshalled, 0, 0x14);
+            return (UnMarshalFolder(marshalled));
+        }
+
+        private FILE GetFile()
+        {
+            FILE FILE = new FILE();
+            byte[] marshalled;
+            marshalled = MarshalFile(FILE);
+            inStream.Read(marshalled, 0, 0x10);
+            return (UnMarshalFile(marshalled));
+        }
+
+        private byte[] MarshalFolder(FOLDER str)
+        {
+            int size = Marshal.SizeOf(str);
+            byte[] arr = new byte[size];
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            Marshal.StructureToPtr(str, ptr, true);
+            Marshal.Copy(ptr, arr, 0, size);
+            Marshal.FreeHGlobal(ptr);
+
+            return arr;
+        }
+
+        private FOLDER UnMarshalFolder(byte[] arr)
+        {
+            FOLDER str = new FOLDER();
+
+            int size = Marshal.SizeOf(str);
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            Marshal.Copy(arr, 0, ptr, size);
+
+            str = (FOLDER)Marshal.PtrToStructure(ptr, str.GetType());
+            Marshal.FreeHGlobal(ptr);
+
+            return str;
+        }
+
+        private byte[] MarshalFile(FILE str)
+        {
+            int size = Marshal.SizeOf(str);
+            byte[] arr = new byte[size];
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            Marshal.StructureToPtr(str, ptr, true);
+            Marshal.Copy(ptr, arr, 0, size);
+            Marshal.FreeHGlobal(ptr);
+
+            return arr;
+        }
+
+        private FILE UnMarshalFile(byte[] arr)
+        {
+            FILE str = new FILE();
+
+            int size = Marshal.SizeOf(str);
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            Marshal.Copy(arr, 0, ptr, size);
+
+            str = (FILE)Marshal.PtrToStructure(ptr, str.GetType());
+            Marshal.FreeHGlobal(ptr);
+
+            return str;
+        }
 
         private String GetNameFromOfs(UInt32 ofs)
         {

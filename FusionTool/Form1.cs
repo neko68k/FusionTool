@@ -41,6 +41,7 @@ namespace FusionTool
         {
             UInt32 depth = 1;
             WAC.FOLDER root;
+            WAC.FOLDER currentFolder;
             WAC.FOLDER[] folderChildren;
             WAC.FILE[] fileChildren;
             WAC wac = new WAC(stream);
@@ -50,14 +51,17 @@ namespace FusionTool
             treeView1.Nodes.Clear();
 
             root = wac.GetRoot();
-            TreeNode node = new TreeNode(wac.GetName(root));
+            TreeNode node = new TreeNode(root.fileName);
             node.Tag = root;
             treeView1.Nodes.Add(node);
-
+            currentFolder = root;
 
             while (depth >= 1)
             {
-                
+                for (int i = 0; i < currentFolder.numFolders; i++)
+                {
+
+                }
             }
 
             treeView1.EndUpdate();
