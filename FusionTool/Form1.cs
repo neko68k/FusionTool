@@ -39,10 +39,28 @@ namespace FusionTool
 
         private void initTreeView(Stream stream)
         {
+            UInt32 depth = 1;
+            WAC.FOLDER root;
+            WAC.FOLDER[] folderChildren;
+            WAC.FILE[] fileChildren;
             WAC wac = new WAC(stream);
-            // read root entry from WAC and use its folderCount as a limiter 
             
+            // read root entry from WAC and use its folderCount as a limiter 
             treeView1.BeginUpdate();
+            treeView1.Nodes.Clear();
+
+            root = wac.GetRoot();
+            TreeNode node = new TreeNode(wac.GetName(root));
+            node.Tag = root;
+            treeView1.Nodes.Add(node);
+
+
+            while (depth >= 1)
+            {
+                
+            }
+
+            treeView1.EndUpdate();
         }
     }
 }
