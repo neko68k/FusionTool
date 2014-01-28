@@ -45,7 +45,7 @@ namespace FusionTool
 
         public void Close()
         {
-
+            inStream.Close();
         }
 
         public FOLDER GetRoot()

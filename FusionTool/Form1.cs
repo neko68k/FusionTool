@@ -15,7 +15,9 @@ namespace FusionTool
     {
 
         private  WAC wac;
+        private WAD wad;
         private int depth;
+        Stream wadFile;
         
         public Form1()
         {
@@ -24,7 +26,8 @@ namespace FusionTool
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Stream WAC = null;
+            Stream wacFile = null;
+            wadFile = null;
             OpenFileDialog ofd1 = new OpenFileDialog();
 
             ofd1.Filter = "WAC Files (.WAC)|*.WAC";
@@ -35,8 +38,11 @@ namespace FusionTool
 
             if (ofd1.ShowDialog() == DialogResult.OK)
             {
-                WAC = ofd1.OpenFile();
-                initTreeView(WAC);
+                wacFile = ofd1.OpenFile();
+                String fn = ofd1.FileName;
+                wadFile = File.Open(Path.GetDirectoryName(fn) + "\\FILESYS.WAD", FileMode.Open);
+                wad = new WAD(wadFile);
+                initTreeView(wacFile);
             }
         }
 
@@ -44,47 +50,52 @@ namespace FusionTool
         {
             
             WAC.FOLDER root;
-            WAC.FOLDER currentFolder;
-            WAC.FOLDER[] folderChildren;
-            depth = -1;
             wac = new WAC(stream);
             
-            // read root entry from WAC and use its folderCount as a limiter 
             treeView1.BeginUpdate();
             treeView1.Nodes.Clear();
 
             root = wac.GetRoot();
             TreeNode node = new TreeNode(root.fileName);
-            //node.Tag = root;
-            //treeView1.Nodes.Add(node);
-            //currentFolder = root;
-           
             treeView1.Nodes.Add(AddFolderChildren(root));
-            
-            //WAC.FOLDER[] test2 = wac.GetFolders(test[0]);
-            //WAC.FILE[] test3 = wac.GetFiles(test2[0]);
-
-            
-            
 
             treeView1.EndUpdate();
+            wac.Close();
         }
 
         private TreeNode AddFolderChildren(WAC.FOLDER folderInfo)
         {
-            WAC.FILE[] fileChildren;
             TreeNode dirNode = new TreeNode(folderInfo.fileName);
             foreach (WAC.FOLDER folder in wac.GetFolders(folderInfo))
             {
-                dirNode.Nodes.Add(AddFolderChildren(folder));
+                TreeNode foldernode = AddFolderChildren(folder);
+                foldernode.Tag = folder;
+                dirNode.Nodes.Add(foldernode);
             }
             foreach (WAC.FILE file in wac.GetFiles(folderInfo))
             {
-                dirNode.Nodes.Add(new TreeNode(file.fileName));
+                TreeNode filenode = new TreeNode(file.fileName);
+                filenode.Tag = file;
+                dirNode.Nodes.Add(filenode);
             }
             
             return dirNode;
         }
+
+
+        private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (!e.Node.Text.Contains("\\"))
+            {
+                WAC.FILE test = (WAC.FILE)e.Node.Tag;
+                String test2 = test.fileName;
+                byte[] test3 = wad.GetFileFromOfs(test.offset, test.size);
+                return;
+            }
+            return;
+        }
+
+    
         
         
     }
