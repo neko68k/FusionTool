@@ -56,13 +56,13 @@ namespace FusionTool
             treeView1.Nodes.Add(node);
             currentFolder = root;
 
-            while (depth >= 1)
+            /*while (depth >= 1)
             {
                 for (int i = 0; i < currentFolder.numFolders; i++)
                 {
 
                 }
-            }
+            }*/
 
             treeView1.EndUpdate();
         }

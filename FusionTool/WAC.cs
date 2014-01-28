@@ -19,7 +19,7 @@ namespace FusionTool
             public UInt32 folderTOCOfs;
 
             // not in the file. used internally by program.
-            public UInt32 thisOffset;
+            public long thisOffset;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
             public String fileName;
         }
@@ -31,7 +31,7 @@ namespace FusionTool
             public UInt32 offset;
 
             // not in the file. used internally by program.
-            public UInt32 thisOffset;
+            public long thisOffset;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
             public String fileName;
         }
@@ -81,17 +81,24 @@ namespace FusionTool
             FOLDER folder = new FOLDER();
             byte[] marshalled;
             marshalled = MarshalFolder(folder);
+            folder.thisOffset = inStream.Position;
             inStream.Read(marshalled, 0, 0x14);
-            return (UnMarshalFolder(marshalled));
+            folder = UnMarshalFolder(marshalled);
+            folder.fileName = GetNameFromOfs(folder.filenameOfs);
+            
+            return (folder);
         }
 
         private FILE GetFile()
         {
-            FILE FILE = new FILE();
+            FILE file = new FILE();
             byte[] marshalled;
-            marshalled = MarshalFile(FILE);
+            marshalled = MarshalFile(file);
+            file.thisOffset = inStream.Position;
             inStream.Read(marshalled, 0, 0x10);
-            return (UnMarshalFile(marshalled));
+            file = UnMarshalFile(marshalled);
+            file.fileName = GetNameFromOfs(file.filenameOfs);
+            return (file);
         }
 
         private byte[] MarshalFolder(FOLDER str)
@@ -152,16 +159,16 @@ namespace FusionTool
 
         private String GetNameFromOfs(UInt32 ofs)
         {
-            StringBuilder builder = new StringBuilder();
-            Int32 c = 0;
-            c = inStream.ReadByte();
+            List<byte> list = new List<byte>();
+            Byte c = 0;
+            c = (Byte)inStream.ReadByte();
             while (c != 0)
             {
-                builder.Append(c);
-                c = inStream.ReadByte();
+                list.Add(c);
+                c = (Byte)inStream.ReadByte();
             }
 
-            return(builder.ToString());
+            return(Encoding.ASCII.GetString(list.ToArray()));
         }
 
     }
