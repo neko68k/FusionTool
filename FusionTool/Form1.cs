@@ -55,14 +55,14 @@ namespace FusionTool
             node.Tag = root;
             treeView1.Nodes.Add(node);
             currentFolder = root;
-
-            /*while (depth >= 1)
-            {
-                for (int i = 0; i < currentFolder.numFolders; i++)
+            WAC.FOLDER[] test = wac.GetFolders(root);
+            WAC.FOLDER[] test2 = wac.GetFolders(test[0]);
+            
+                /*for (int i = 0; i < currentFolder.numFolders; i++)
                 {
 
-                }
-            }*/
+                }*/
+            
 
             treeView1.EndUpdate();
         }

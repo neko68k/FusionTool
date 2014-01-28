@@ -54,7 +54,26 @@ namespace FusionTool
         }
 
         // get an array of folder children from the passed folder or from root if folder == null
-        //public FOLDER[] GetFolders(FOLDER folder);
+        public FOLDER[] GetFolders(FOLDER folder)
+        {
+            FOLDER[] folders;
+            long curTOCOfs = 0;   // index into TOC 
+            byte[] folderOfs = new byte[4];
+
+            folders = new FOLDER[folder.numFolders];
+            inStream.Seek(folder.folderTOCOfs, SeekOrigin.Begin);
+            curTOCOfs = inStream.Position;
+            for(int i = 0; i<folder.numFolders;i++)
+            {
+                inStream.Read(folderOfs, 0, 4);
+                curTOCOfs = inStream.Position;
+                folders[i] = GetFolderFromOfs(BitConverter.ToUInt32(folderOfs, 0));
+                inStream.Seek(curTOCOfs, SeekOrigin.Begin);
+                
+            }
+
+            return (folders);
+        }
         public String GetName(FOLDER folder) { return (GetNameFromOfs(folder.filenameOfs)); }
         public String GetName(FILE file) { return (GetNameFromOfs(file.filenameOfs)); }
 
@@ -80,8 +99,8 @@ namespace FusionTool
         {
             FOLDER folder = new FOLDER();
             byte[] marshalled;
-            marshalled = MarshalFolder(folder);
             folder.thisOffset = inStream.Position;
+            marshalled = MarshalFolder(folder);
             inStream.Read(marshalled, 0, 0x14);
             folder = UnMarshalFolder(marshalled);
             folder.fileName = GetNameFromOfs(folder.filenameOfs);
@@ -93,8 +112,8 @@ namespace FusionTool
         {
             FILE file = new FILE();
             byte[] marshalled;
-            marshalled = MarshalFile(file);
             file.thisOffset = inStream.Position;
+            marshalled = MarshalFile(file);
             inStream.Read(marshalled, 0, 0x10);
             file = UnMarshalFile(marshalled);
             file.fileName = GetNameFromOfs(file.filenameOfs);
