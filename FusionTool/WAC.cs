@@ -79,7 +79,26 @@ namespace FusionTool
 
         //public FILE GetFile(String name);
         // get an array of file children from the passed folder
-        //public FILE[] GetFiles(FOLDER folder);      
+        public FILE[] GetFiles(FOLDER folder)
+        {
+            FILE[] files;
+            long curTOCOfs = 0;   // index into TOC 
+            byte[] fileOfs = new byte[4];
+
+            files = new FILE[folder.numFiles];
+            inStream.Seek(folder.fileTOCOfs, SeekOrigin.Begin);
+            curTOCOfs = inStream.Position;
+            for (int i = 0; i < folder.numFiles; i++)
+            {
+                inStream.Read(fileOfs, 0, 4);
+                curTOCOfs = inStream.Position;
+                files[i] = GetFileFromOfs(BitConverter.ToUInt32(fileOfs, 0));
+                inStream.Seek(curTOCOfs, SeekOrigin.Begin);
+
+            }
+
+            return (files);
+        }
 
         //public void ReplaceFile(String name, byte[] data);
 

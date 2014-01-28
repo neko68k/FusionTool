@@ -57,7 +57,7 @@ namespace FusionTool
             currentFolder = root;
             WAC.FOLDER[] test = wac.GetFolders(root);
             WAC.FOLDER[] test2 = wac.GetFolders(test[0]);
-            
+            WAC.FILE[] test3 = wac.GetFiles(test2[0]);
                 /*for (int i = 0; i < currentFolder.numFolders; i++)
                 {
 
