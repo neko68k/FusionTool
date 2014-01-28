@@ -27,6 +27,9 @@ namespace FusionTool
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Stream wacFile = null;
+            if (wad != null)
+                wad.Close();
+            wad = null;
             wadFile = null;
             OpenFileDialog ofd1 = new OpenFileDialog();
 
@@ -88,9 +91,14 @@ namespace FusionTool
             if (!e.Node.Text.Contains("\\"))
             {
                 WAC.FILE test = (WAC.FILE)e.Node.Tag;
-                String test2 = test.fileName;
-                byte[] test3 = wad.GetFileFromOfs(test.offset, test.size);
-                return;
+                String path = Path.GetDirectoryName(e.Node.FullPath);
+                // this needs to be fixed
+                // will add an option to save to a particular directory
+                //System.IO.Directory.CreateDirectory(path);
+                byte[] buf = wad.GetFileFromOfs(test.offset, test.size);
+                Stream outFile = File.Open(test.fileName, FileMode.Create);
+                outFile.Write(buf, 0, (int)test.size);
+                outFile.Close();                
             }
             return;
         }
