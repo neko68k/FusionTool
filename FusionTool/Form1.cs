@@ -13,6 +13,9 @@ namespace FusionTool
 {
     public partial class Form1 : Form
     {
+
+        private  WAC wac;
+        private int depth;
         
         public Form1()
         {
@@ -39,12 +42,12 @@ namespace FusionTool
 
         private void initTreeView(Stream stream)
         {
-            UInt32 depth = 1;
+            
             WAC.FOLDER root;
             WAC.FOLDER currentFolder;
             WAC.FOLDER[] folderChildren;
-            WAC.FILE[] fileChildren;
-            WAC wac = new WAC(stream);
+            depth = -1;
+            wac = new WAC(stream);
             
             // read root entry from WAC and use its folderCount as a limiter 
             treeView1.BeginUpdate();
@@ -52,19 +55,37 @@ namespace FusionTool
 
             root = wac.GetRoot();
             TreeNode node = new TreeNode(root.fileName);
-            node.Tag = root;
-            treeView1.Nodes.Add(node);
-            currentFolder = root;
-            WAC.FOLDER[] test = wac.GetFolders(root);
-            WAC.FOLDER[] test2 = wac.GetFolders(test[0]);
-            WAC.FILE[] test3 = wac.GetFiles(test2[0]);
-                /*for (int i = 0; i < currentFolder.numFolders; i++)
-                {
+            //node.Tag = root;
+            //treeView1.Nodes.Add(node);
+            //currentFolder = root;
+           
+            treeView1.Nodes.Add(AddFolderChildren(root));
+            
+            //WAC.FOLDER[] test2 = wac.GetFolders(test[0]);
+            //WAC.FILE[] test3 = wac.GetFiles(test2[0]);
 
-                }*/
+            
             
 
             treeView1.EndUpdate();
         }
+
+        private TreeNode AddFolderChildren(WAC.FOLDER folderInfo)
+        {
+            WAC.FILE[] fileChildren;
+            TreeNode dirNode = new TreeNode(folderInfo.fileName);
+            foreach (WAC.FOLDER folder in wac.GetFolders(folderInfo))
+            {
+                dirNode.Nodes.Add(AddFolderChildren(folder));
+            }
+            foreach (WAC.FILE file in wac.GetFiles(folderInfo))
+            {
+                dirNode.Nodes.Add(new TreeNode(file.fileName));
+            }
+            
+            return dirNode;
+        }
+        
+        
     }
 }
