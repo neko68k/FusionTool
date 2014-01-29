@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
 
 namespace FusionTool
 {
@@ -22,9 +23,13 @@ namespace FusionTool
 
         public byte[] GetFileFromOfs(long ofs, UInt32 size)
         {
+            Cursor.Current = Cursors.WaitCursor;
+            Application.DoEvents();
             byte[] buf = new byte[size];
             wad.Seek(ofs, SeekOrigin.Begin);
             wad.Read(buf, 0, (int)size);
+            Cursor.Current = Cursors.Default;
+            Application.DoEvents();
             return buf;
         }
 
