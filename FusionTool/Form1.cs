@@ -18,10 +18,13 @@ namespace FusionTool
         private WAD wad;
         private int depth;
         Stream wadFile;
+        TextBox textBox1;
+        PictureBox picBox1;
         
         public Form1()
         {
             InitializeComponent();
+            textBox1 = null;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -91,14 +94,55 @@ namespace FusionTool
             if (!e.Node.Text.Contains("\\"))
             {
                 WAC.FILE test = (WAC.FILE)e.Node.Tag;
-                String path = Path.GetDirectoryName(e.Node.FullPath);
+                /********** FILE EXTRACTION SHIT. WILL BE MOVED TO CONTEXT MENU. *********/               
+                /*ring path = Path.GetDirectoryName(e.Node.FullPath);
                 // this needs to be fixed
                 // will add an option to save to a particular directory
                 //System.IO.Directory.CreateDirectory(path);
                 byte[] buf = wad.GetFileFromOfs(test.offset, test.size);
                 Stream outFile = File.Open(test.fileName, FileMode.Create);
                 outFile.Write(buf, 0, (int)test.size);
-                outFile.Close();                
+                outFile.Close();   */ 
+                /********** END *********/
+
+
+                // handle opening files and dynamically adding a widget to the right half of the splitview
+                // to support said file
+                if (e.Node.Text.Contains("INI") || e.Node.Text.Contains("BAT") || e.Node.Text.Contains("TXT"))
+                {
+
+                    Panel rightPanel = splitContainer1.Panel2;
+
+                    if (textBox1 == null)
+                        textBox1 = new TextBox();
+                    //rightPanel.Controls.Remove(textBox1);                        
+                    
+                    //textBox1.Text = "test";
+                    textBox1.Dock = DockStyle.Fill;
+                    textBox1.Multiline = true;
+                    byte[] buf = wad.GetFileFromOfs(test.offset, test.size);
+                    textBox1.Text = System.Text.Encoding.UTF8.GetString(buf);
+                    textBox1.ScrollBars = ScrollBars.Both;
+                    rightPanel.Controls.Add(textBox1);
+                    
+                    
+                }
+                else if (e.Node.Text.Contains("MUN"))
+                {
+                    MemoryStream imgStream = null;
+                    // read data
+                    // deswizzle
+                    // MemoryStream imgStream = new MemoryStream(deswizData);
+                    Image.FromStream(imgStream);
+                    picBox1 = new PictureBox();
+                    picBox1.Dock = DockStyle.Fill;
+                }
+                else if (e.Node.Text.Contains("TRI"))
+                {
+                    // load and parse vertex data
+                    // instance an opengl widget and do all the magic
+                    // will want some rotation etc interface for this
+                }
             }
             return;
         }
