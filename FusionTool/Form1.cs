@@ -88,6 +88,7 @@ namespace FusionTool
             return dirNode;
         }
 
+        
 
         private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
@@ -95,14 +96,14 @@ namespace FusionTool
             {
                 WAC.FILE test = (WAC.FILE)e.Node.Tag;
                 /********** FILE EXTRACTION SHIT. WILL BE MOVED TO CONTEXT MENU. *********/               
-                /*ring path = Path.GetDirectoryName(e.Node.FullPath);
+               /* String path = Path.GetDirectoryName(e.Node.FullPath);
                 // this needs to be fixed
                 // will add an option to save to a particular directory
                 //System.IO.Directory.CreateDirectory(path);
                 byte[] buf = wad.GetFileFromOfs(test.offset, test.size);
                 Stream outFile = File.Open(test.fileName, FileMode.Create);
                 outFile.Write(buf, 0, (int)test.size);
-                outFile.Close();   */ 
+                outFile.Close();   */
                 /********** END *********/
 
 
@@ -133,9 +134,10 @@ namespace FusionTool
                     // read data
                     // deswizzle
                     // MemoryStream imgStream = new MemoryStream(deswizData);
-                    Image.FromStream(imgStream);
-                    picBox1 = new PictureBox();
-                    picBox1.Dock = DockStyle.Fill;
+                    //Image.FromStream(imgStream);
+                    //picBox1 = new PictureBox();
+                    //picBox1.Dock = DockStyle.Fill;
+                    MUN mun = new MUN();
                 }
                 else if (e.Node.Text.Contains("TRI"))
                 {
