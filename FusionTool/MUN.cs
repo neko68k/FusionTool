@@ -11,8 +11,8 @@ namespace FusionTool
 
     unsafe class MUN
     {
-
-        [DllImport(@"SubaSwizzle.dll", EntryPoint="writeTexPSMCT32")]        
+        // Frame buffer types
+        [DllImport(@"SubaSwizzle.dll", CallingConvention = CallingConvention.Cdecl)]        
         public static extern void writeTexPSMCT32(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, void* data);
         [DllImport(@"SubaSwizzle.dll", CallingConvention=CallingConvention.Cdecl)]
         public static extern void readTexPSMCT32(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, void* data);

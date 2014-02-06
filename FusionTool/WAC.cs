@@ -38,19 +38,43 @@ namespace FusionTool
 
         private Stream inStream;
 
-        public WAC(Stream stream)
+        private WAD wad;
+        Stream wadFile;
+
+
+        public WAC(Stream stream, String fn)
         {
             inStream = stream;
+            if (wad != null)
+                wad.Close();
+            wad = null;
+            wadFile = null;
+
+            wadFile = File.Open(Path.GetDirectoryName(fn) + "\\FILESYS.WAD", FileMode.Open);
+            wad = new WAD(wadFile);
         }
 
         public void Close()
         {
             inStream.Close();
+            wad.Close();
         }
 
         public FOLDER GetRoot()
         {
             return GetFolder();
+        }
+
+        // simple replacement, no rebuild of the WAD
+        public void ReplaceFile(FILE inFile, byte[] buf, UInt32 size)
+        {
+            inStream.Seek(inFile.thisOffset, SeekOrigin.Begin);
+            inFile.size = size;
+            byte[] marshalled = MarshalFile(inFile);
+            inStream.Write(marshalled, 0, Marshal.SizeOf(inFile)-104);
+            UnMarshalFile(marshalled);
+            wad.ReplaceFile(buf, inFile.offset, inFile.size, inFile.sizeInBlocks);
+
         }
 
         // get an array of folder children from the passed folder or from root if folder == null
@@ -98,6 +122,11 @@ namespace FusionTool
             }
 
             return (files);
+        }
+
+        public byte[] ExtractFile(FILE file)
+        {
+            return (wad.GetFileFromOfs(file.offset, file.size));
         }
 
         //public void ReplaceFile(String name, byte[] data);

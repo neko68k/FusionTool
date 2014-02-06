@@ -21,6 +21,17 @@ namespace FusionTool
             wad.Close();
         }
 
+        // simple replacement, no rebuild of the WAD
+        public void ReplaceFile(byte[] buf, long ofs, UInt32 size, UInt32 blocks)
+        {
+            wad.Seek(ofs, SeekOrigin.Begin);
+            byte[] blockBuf = new byte[blocks * 2048];
+            buf.CopyTo(blockBuf, 0);
+            wad.Write(blockBuf, 0, (int)blocks * 2048);
+
+
+        }
+
         public byte[] GetFileFromOfs(long ofs, UInt32 size)
         {
             Cursor.Current = Cursors.WaitCursor;

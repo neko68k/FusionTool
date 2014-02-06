@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FusionTool", "FusionTool\FusionTool.csproj", "{0C04F810-F463-40E8-92D6-2AA72AD9225E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A0187153-2A18-4A83-B9E6-FEAA5C6AD0C5} = {A0187153-2A18-4A83-B9E6-FEAA5C6AD0C5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SubaSwizzle", "SubaSwizzle\SubaSwizzle.vcxproj", "{A0187153-2A18-4A83-B9E6-FEAA5C6AD0C5}"
 EndProject
